@@ -1,20 +1,22 @@
 "use strict";
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __exportStar = (this && this.__exportStar) || function(m, exports) {
-    for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-__exportStar(require("./APIDefinitionDownloader"), exports);
-__exportStar(require("./BaseAPI"), exports);
-__exportStar(require("./HttpError"), exports);
-__exportStar(require("./HttpResponse"), exports);
-__exportStar(require("./PathParser"), exports);
-__exportStar(require("./QuerySchemaCompiler"), exports);
-__exportStar(require("./QueryValidation"), exports);
-__exportStar(require("./ValidationError"), exports);
+exports.ValidationError = exports.QueryValidation = exports.QuerySchemaCompiler = exports.PathParser = exports.HttpResponse = exports.HttpError = exports.BaseAPI = exports.APIDefinitionDownloader = void 0;
+const APIDefinitionDownloader_1 = __importDefault(require("./APIDefinitionDownloader"));
+exports.APIDefinitionDownloader = APIDefinitionDownloader_1.default;
+const BaseAPI_1 = __importDefault(require("./BaseAPI"));
+exports.BaseAPI = BaseAPI_1.default;
+const HttpError_1 = __importDefault(require("./HttpError"));
+exports.HttpError = HttpError_1.default;
+const HttpResponse_1 = __importDefault(require("./HttpResponse"));
+exports.HttpResponse = HttpResponse_1.default;
+const PathParser_1 = __importDefault(require("./PathParser"));
+exports.PathParser = PathParser_1.default;
+const QuerySchemaCompiler_1 = __importDefault(require("./QuerySchemaCompiler"));
+exports.QuerySchemaCompiler = QuerySchemaCompiler_1.default;
+const QueryValidation_1 = __importDefault(require("./QueryValidation"));
+exports.QueryValidation = QueryValidation_1.default;
+const ValidationError_1 = __importDefault(require("./ValidationError"));
+exports.ValidationError = ValidationError_1.default;
