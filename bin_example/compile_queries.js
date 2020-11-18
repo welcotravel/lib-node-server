@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-const QueryCompiler = require('../dist/QuerySchemaCompiler');
+const {QuerySchemaCompiler} = require('lib-node-server');
 
 const sDefinitionPath = `${__dirname}/../src/@types/maps.welco.me/Queries.d.ts`;
 const aPaths = [
@@ -9,4 +9,4 @@ const aPaths = [
     `${__dirname}/../src/schemas/tile.json`
 ];
 
-QueryCompiler.compile(sDefinitionPath, aPaths);
+QuerySchemaCompiler.compile(sDefinitionPath, aPaths);

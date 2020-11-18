@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 
-const consul                  = require('consul')({promisify: true});
-const APIDefinitionDownloader = require('../dist/APIDefinitionDownloader');
+//const CONFIG  = require('/etc/welco/config.maps.json');
+const consul                    = require('consul')({promisify: true});
+const {APIDefinitionDownloader} = require('lib-node-server');
 
 const sDefinitionPath = `${__dirname}/../src/@types/maps.welco.me/API.d.ts`;
 
@@ -12,6 +13,14 @@ const oPaths = {
 };
 
 (async () => {
+    /*
+        const oConfig = {
+            api_domain:     CONFIG.uri.api,
+            service_id:     CONFIG.api.docs.client_id,
+            service_secret: CONFIG.api.docs.client_secret
+        }
+    */
+
     const oDomain        = await consul.kv.get({key: 'icons/uri/domain'});
     const oServiceId     = await consul.kv.get({key: 'icons/api/service/id'});
     const oServiceSecret = await consul.kv.get({key: 'icons/api/service/secret'});
