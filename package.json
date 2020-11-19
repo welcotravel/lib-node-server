@@ -9,6 +9,7 @@
     "build": "tsc -p ."
   },
   "dependencies": {
+    "ajv": "^6.12.6",
     "http-shutdown": "^1.2.2",
     "js-yaml": "^3.12.1",
     "json-schema-to-typescript": "^9.0.1",
