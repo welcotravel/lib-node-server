@@ -7,9 +7,19 @@ import Dot         from 'dot-object';
 import {Logger}    from 'rsyslog-cee';
 import {TraceTags} from "rsyslog-cee/src/Logger";
 
-const Consul = require('consul')({promisify: true});
-
 require('http-shutdown').extend();
+
+const ConsulLib = require('consul');
+const oConsulConfig = {
+    promisify: true,
+    host: '127.0.0.1'
+};
+
+if (process.env.CONSUL_HOST) {
+    oConsulConfig.host = process.env.CONSUL_HOST;
+}
+
+const Consul = ConsulLib(oConsulConfig)
 
 const fsPromises  = fs.promises;
 

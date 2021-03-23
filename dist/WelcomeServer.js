@@ -8,8 +8,16 @@ const fs_1 = __importDefault(require("fs"));
 const http_1 = __importDefault(require("http"));
 const dot_object_1 = __importDefault(require("dot-object"));
 const rsyslog_cee_1 = require("rsyslog-cee");
-const Consul = require('consul')({ promisify: true });
 require('http-shutdown').extend();
+const ConsulLib = require('consul');
+const oConsulConfig = {
+    promisify: true,
+    host: '127.0.0.1'
+};
+if (process.env.CONSUL_HOST) {
+    oConsulConfig.host = process.env.CONSUL_HOST;
+}
+const Consul = ConsulLib(oConsulConfig);
 const fsPromises = fs_1.default.promises;
 class WelcomeServer {
     constructor(sName, oHttpListener) {
