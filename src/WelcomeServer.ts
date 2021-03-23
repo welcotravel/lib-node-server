@@ -2,6 +2,7 @@ require('make-promises-safe');
 
 import fs          from 'fs';
 import http        from 'http';
+import Dot         from 'dot-object';
 
 import {Logger}    from 'rsyslog-cee';
 import {TraceTags} from "rsyslog-cee/src/Logger";
@@ -54,7 +55,8 @@ export default class WelcomeServer<AppConfig> {
     private loadConfigConsul = async () => {
         const oFlatConfig: {[key: string]: string} = {};
         const aGets = this.aConfigPaths.map(async (sPath) => {
-            const oKey = await Consul.kv.get({key: this.sConfigPrefix + '/' + sPath});
+            const sSlashed = this.sConfigPrefix + '/' + sPath.replace(/\./g, '/');
+            const oKey     = await Consul.kv.get({key: sSlashed});
             if (oKey) {
                 oFlatConfig[sPath] = oKey.Value;
             }
@@ -62,19 +64,7 @@ export default class WelcomeServer<AppConfig> {
 
         try {
             await Promise.all(aGets);
-
-            const oConfig: {[key: string]: string} = {};
-            Object.keys(oFlatConfig).map(sPath => {
-                const aPath = sPath.split('/');
-                const iPath = aPath.length;
-                aPath.reduce( (oConfig: any, sValue: string, iIndex: number) => {
-                    if (iIndex === iPath - 1) {
-                        oConfig[sValue] = oFlatConfig[sPath]
-                    }
-
-                    return oConfig[sValue];
-                });
-            });
+            const oConfig = Dot.object(oFlatConfig);
 
             this.oLogger.d('Server.Config.Ready');
             this.updateConfig(<AppConfig> <unknown> oConfig).catch(oError => {
@@ -93,7 +83,7 @@ export default class WelcomeServer<AppConfig> {
             this.fAfterConfig(this.oConfig, this.oLogger.getTraceTags());
         }
 
-        this.iPort = this.getPort(this.oConfig);
+        this.iPort = Dot.pick(this.sPortConfigPath, oConfig);
 
         if (!this.bInitOnce) {
             this.bInitOnce = true;
@@ -116,12 +106,6 @@ export default class WelcomeServer<AppConfig> {
         }
 
     };
-
-    // https://stackoverflow.com/a/22129960/14651
-    private getPort(oConfig: AppConfig): any {
-        // @ts-ignore
-        return this.sPortConfigPath.split('.').reduce((prev, curr) => prev && prev[curr], oConfig)
-    }
 
     constructor(sName: string, oHttpListener: HttpListener) {
         this.oHttpListener   = oHttpListener;
