@@ -11,7 +11,11 @@ const Consul = require('consul')({ promisify: true });
 require('http-shutdown').extend();
 const fsPromises = fs_1.default.promises;
 class WelcomeServer {
-    constructor(sName, sPortConfigPath, oHttpListener, fAfterConfig) {
+    constructor(sName, oHttpListener) {
+        this.sConfigPath = '';
+        this.sConfigPrefix = '';
+        this.aConfigPaths = [];
+        this.sPortConfigPath = '';
         this.bInitOnce = false;
         // Check to see that we have access to the config file.  if so, update the config var, else retry
         // When consul-template is down or restarting, the config file will be missing.  This keeps
@@ -19,13 +23,14 @@ class WelcomeServer {
         this.loadConfigFile = async () => {
             fsPromises.access(this.sConfigPath, fs_1.default.constants.R_OK)
                 .then(() => {
+                const oConfig = require(this.sConfigPath); // Update the global config var
                 this.oLogger.d('Server.Config.Ready');
-                this.updateConfig().catch(oError => {
+                this.updateConfig(oConfig).catch(oError => {
                     this.oLogger.e('Server.Config.Error', { error: oError });
                 });
             })
-                .catch(() => {
-                this.oLogger.w('Server.Config.NotAvailable');
+                .catch(oError => {
+                this.oLogger.w('Server.Config.NotAvailable', { error: oError });
                 setTimeout(this.loadConfigFile, 1000);
             });
         };
@@ -34,7 +39,12 @@ class WelcomeServer {
         // the server up and ready to start while consul-template gets itself together
         this.loadConfigConsul = async () => {
             const oFlatConfig = {};
-            const aGets = this.aConfigPaths.map(async (sPath) => oFlatConfig[sPath] = Consul.kv.get({ key: sPath }));
+            const aGets = this.aConfigPaths.map(async (sPath) => {
+                const oKey = await Consul.kv.get({ key: this.sConfigPrefix + '/' + sPath });
+                if (oKey) {
+                    oFlatConfig[sPath] = oKey.Value;
+                }
+            });
             try {
                 await Promise.all(aGets);
                 const oConfig = {};
@@ -48,41 +58,42 @@ class WelcomeServer {
                         return oConfig[sValue];
                     });
                 });
-                return oConfig;
+                this.oLogger.d('Server.Config.Ready');
+                this.updateConfig(oConfig).catch(oError => {
+                    this.oLogger.e('Server.Config.Error', { error: oError });
+                });
             }
             catch (e) {
                 this.oLogger.w('Server.Config.NotAvailable');
                 setTimeout(this.loadConfigConsul, 1000);
             }
         };
-        this.updateConfig = async () => {
-            const oConfig = require(this.sConfigPath); // Update the global config var
-            this.fAfterConfig(oConfig, this.oLogger.getTraceTags());
-            const sPort = this.getPort(oConfig);
+        this.updateConfig = async (oConfig) => {
+            this.oConfig = oConfig;
+            if (this.fAfterConfig) {
+                this.fAfterConfig(this.oConfig, this.oLogger.getTraceTags());
+            }
+            this.iPort = this.getPort(this.oConfig);
             if (!this.bInitOnce) {
                 this.bInitOnce = true;
                 // Fire up the node server - initialize the http-shutdown plugin which will gracefully shutdown the server after it's done working
                 this.oHTTPServer = http_1.default.createServer(this.oHttpListener);
                 this.oHTTPServer.withShutdown();
-                this.oHTTPServer.listen(sPort);
-                this.oLogger.d('Server.Started', { port: sPort });
+                this.oHTTPServer.listen(this.iPort);
+                this.oLogger.d('Server.Started', { port: this.iPort });
                 this.oLogger.summary('Init');
             }
             else {
                 // we've initialized before, so this must be a restart due to a config change
                 this.oLogger.d('Server.Config.Changed');
                 this.oHTTPServer.shutdown(() => {
-                    this.oHTTPServer.listen(sPort);
-                    this.oLogger.d('Server.Restarted', { port: sPort });
+                    this.oHTTPServer.listen(this.iPort);
+                    this.oLogger.d('Server.Restarted', { port: this.iPort });
                     this.oLogger.summary('Init');
                 });
             }
         };
-        this.aConfigPaths = [];
-        this.sConfigPath = '';
-        this.sPortConfigPath = sPortConfigPath;
         this.oHttpListener = oHttpListener;
-        this.fAfterConfig = fAfterConfig;
         this.oLogger = new rsyslog_cee_1.Logger({
             service: `${sName}Server`
         });
@@ -92,8 +103,11 @@ class WelcomeServer {
         // @ts-ignore
         return this.sPortConfigPath.split('.').reduce((prev, curr) => prev && prev[curr], oConfig);
     }
-    initWithConsulConfig(aConfigPaths) {
+    initWithConsulConfig(sConfigPrefix, aConfigPaths, sPortConfigPath, fAfterConfig) {
+        this.sConfigPrefix = sConfigPrefix;
         this.aConfigPaths = aConfigPaths;
+        this.sPortConfigPath = sPortConfigPath;
+        this.fAfterConfig = fAfterConfig;
         // When our configs are updated a `reload` call is generated by systemd.  This handles that call to reload
         process.on('SIGHUP', async () => {
             this.oLogger.d('Server.Config.SigHUP_Reload');
@@ -104,8 +118,10 @@ class WelcomeServer {
             this.oLogger.e('Server.Config.Error', { error: oError });
         });
     }
-    initWithJsonConfig(sConfigPath) {
+    initWithJsonConfig(sConfigPath, sPortConfigPath, fAfterConfig) {
         this.sConfigPath = sConfigPath;
+        this.sPortConfigPath = sPortConfigPath;
+        this.fAfterConfig = fAfterConfig;
         // When our configs are updated a `reload` call is generated by systemd.  This handles that call to reload
         process.on('SIGHUP', async () => {
             this.oLogger.d('Server.Config.SigHUP_Reload');
