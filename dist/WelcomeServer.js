@@ -6,6 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 require('make-promises-safe');
 const fs_1 = __importDefault(require("fs"));
 const http_1 = __importDefault(require("http"));
+const dot_object_1 = __importDefault(require("dot-object"));
 const rsyslog_cee_1 = require("rsyslog-cee");
 const Consul = require('consul')({ promisify: true });
 require('http-shutdown').extend();
@@ -40,24 +41,15 @@ class WelcomeServer {
         this.loadConfigConsul = async () => {
             const oFlatConfig = {};
             const aGets = this.aConfigPaths.map(async (sPath) => {
-                const oKey = await Consul.kv.get({ key: this.sConfigPrefix + '/' + sPath });
+                const sSlashed = this.sConfigPrefix + '/' + sPath.replace(/\./g, '/');
+                const oKey = await Consul.kv.get({ key: sSlashed });
                 if (oKey) {
                     oFlatConfig[sPath] = oKey.Value;
                 }
             });
             try {
                 await Promise.all(aGets);
-                const oConfig = {};
-                Object.keys(oFlatConfig).map(sPath => {
-                    const aPath = sPath.split('/');
-                    const iPath = aPath.length;
-                    aPath.reduce((oConfig, sValue, iIndex) => {
-                        if (iIndex === iPath - 1) {
-                            oConfig[sValue] = oFlatConfig[sPath];
-                        }
-                        return oConfig[sValue];
-                    });
-                });
+                const oConfig = dot_object_1.default.object(oFlatConfig);
                 this.oLogger.d('Server.Config.Ready');
                 this.updateConfig(oConfig).catch(oError => {
                     this.oLogger.e('Server.Config.Error', { error: oError });
@@ -73,7 +65,7 @@ class WelcomeServer {
             if (this.fAfterConfig) {
                 this.fAfterConfig(this.oConfig, this.oLogger.getTraceTags());
             }
-            this.iPort = this.getPort(this.oConfig);
+            this.iPort = dot_object_1.default.pick(this.sPortConfigPath, oConfig);
             if (!this.bInitOnce) {
                 this.bInitOnce = true;
                 // Fire up the node server - initialize the http-shutdown plugin which will gracefully shutdown the server after it's done working
@@ -97,11 +89,6 @@ class WelcomeServer {
         this.oLogger = new rsyslog_cee_1.Logger({
             service: `${sName}Server`
         });
-    }
-    // https://stackoverflow.com/a/22129960/14651
-    getPort(oConfig) {
-        // @ts-ignore
-        return this.sPortConfigPath.split('.').reduce((prev, curr) => prev && prev[curr], oConfig);
     }
     initWithConsulConfig(sConfigPrefix, aConfigPaths, sPortConfigPath, fAfterConfig) {
         this.sConfigPrefix = sConfigPrefix;
