@@ -30,9 +30,9 @@ export default class WelcomeServer<AppConfig> {
     private sConfigPath: string     = '';
     private sConfigPrefix: string   = '';
     private aConfigPaths: string[]  = [];
-    private sPortConfigPath: string = '';
+    private sPortConfigPath: string | undefined;
 
-    private iPort: number | undefined;
+    private iPort: number = 80;
     private bInitOnce: boolean = false;
     private oLogger: Logger;
     private oHTTPServer: any; // cannot be http.Server because it also has the shutdown method
@@ -88,7 +88,9 @@ export default class WelcomeServer<AppConfig> {
             this.fAfterConfig(this.oConfig, this.oLogger.getTraceTags());
         }
 
-        this.iPort = Dot.pick(this.sPortConfigPath, oConfig);
+        if (this.sPortConfigPath) {
+            this.iPort = Dot.pick(this.sPortConfigPath, oConfig);
+        }
 
         if (!this.bInitOnce) {
             this.bInitOnce = true;
@@ -112,15 +114,16 @@ export default class WelcomeServer<AppConfig> {
 
     };
 
-    constructor(sName: string, oHttpListener: HttpListener) {
+    constructor(sName: string, oHttpListener: HttpListener, iPort: number = 80) {
         this.oHttpListener   = oHttpListener;
+        this.iPort           = iPort
 
         this.oLogger = new Logger({
             service: `${sName}Server`
         });
     }
 
-    async initWithConsulConfig(sConfigPrefix: string, aConfigPaths: string[], sPortConfigPath: string, fAfterConfig: AfterConfig) {
+    async initWithConsulConfig(sConfigPrefix: string, aConfigPaths: string[], sPortConfigPath: string | undefined, fAfterConfig: AfterConfig) {
         this.sConfigPrefix   = sConfigPrefix;
         this.aConfigPaths    = aConfigPaths;
         this.sPortConfigPath = sPortConfigPath;
@@ -143,7 +146,7 @@ export default class WelcomeServer<AppConfig> {
 
     }
 
-    async initWithJsonConfig(sConfigPath: string, sPortConfigPath: string, fAfterConfig: AfterConfig) {
+    async initWithJsonConfig(sConfigPath: string, sPortConfigPath: string | undefined, fAfterConfig: AfterConfig) {
         this.sConfigPath     = sConfigPath;
         this.sPortConfigPath = sPortConfigPath;
         this.fAfterConfig    = fAfterConfig;

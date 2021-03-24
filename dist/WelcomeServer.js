@@ -20,11 +20,11 @@ if (process.env.CONSUL_HOST) {
 const Consul = ConsulLib(oConsulConfig);
 const fsPromises = fs_1.default.promises;
 class WelcomeServer {
-    constructor(sName, oHttpListener) {
+    constructor(sName, oHttpListener, iPort = 80) {
         this.sConfigPath = '';
         this.sConfigPrefix = '';
         this.aConfigPaths = [];
-        this.sPortConfigPath = '';
+        this.iPort = 80;
         this.bInitOnce = false;
         // Check to see that we have access to the config file.  if so, update the config var, else retry
         // When consul-template is down or restarting, the config file will be missing.  This keeps
@@ -68,7 +68,9 @@ class WelcomeServer {
             if (this.fAfterConfig) {
                 this.fAfterConfig(this.oConfig, this.oLogger.getTraceTags());
             }
-            this.iPort = dot_object_1.default.pick(this.sPortConfigPath, oConfig);
+            if (this.sPortConfigPath) {
+                this.iPort = dot_object_1.default.pick(this.sPortConfigPath, oConfig);
+            }
             if (!this.bInitOnce) {
                 this.bInitOnce = true;
                 // Fire up the node server - initialize the http-shutdown plugin which will gracefully shutdown the server after it's done working
@@ -89,6 +91,7 @@ class WelcomeServer {
             }
         };
         this.oHttpListener = oHttpListener;
+        this.iPort = iPort;
         this.oLogger = new rsyslog_cee_1.Logger({
             service: `${sName}Server`
         });
