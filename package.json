@@ -5,9 +5,6 @@
   "private": true,
   "author": "Mark Armendariz <marka@welco.me>",
   "license": "Copyright Welcome AI, Inc 2020",
-  "scripts": {
-    "build": "tsc -p ."
-  },
   "dependencies": {
     "ajv": "^7.2.1",
     "consul": "^0.40.0",
