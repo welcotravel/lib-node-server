@@ -3,22 +3,19 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const fs_1 = __importDefault(require("fs"));
 const ajv_1 = __importDefault(require("ajv"));
 const ValidationError_1 = __importDefault(require("./ValidationError"));
-const fsPromises = fs_1.default.promises;
 class QueryValidation {
-    constructor(sFile) {
-        this.sFile = sFile;
+    constructor(oSchema) {
+        this.oSchema = oSchema;
     }
     async init() {
-        const oContents = await fsPromises.readFile(this.sFile);
-        const oQuerySchema = JSON.parse(oContents.toString('utf-8'));
-        const oAJV = new ajv_1.default({
+        const oOptions = {
             coerceTypes: true,
             useDefaults: true
-        });
-        this.oValidator = oAJV.compile(oQuerySchema);
+        };
+        const oAJV = new ajv_1.default(oOptions);
+        this.oValidator = oAJV.compile(this.oSchema);
     }
     validateRequest(oQuery, oLogger) {
         if (!this.oValidator) {
