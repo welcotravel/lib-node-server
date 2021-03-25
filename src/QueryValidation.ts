@@ -1,31 +1,28 @@
-import fs                        from "fs";
-
-import Ajv, {ValidateFunction}   from 'ajv';
+import Ajv, {
+    AnySchema,
+    ValidateFunction
+}                                from 'ajv';
 import {ParsedUrlQuery}          from "querystring";
 import {Logger}                  from 'rsyslog-cee';
 
 import ValidationError           from './ValidationError'
 
-const fsPromises  = fs.promises;
-
 export default class QueryValidation {
-    readonly sFile:      string;
+    readonly oSchema: AnySchema;
 
     private oValidator?: ValidateFunction;
 
-    constructor(sFile: string) {
-        this.sFile = sFile;
+    constructor(oSchema: AnySchema) {
+        this.oSchema = oSchema;
     }
 
     async init() {
-        const oContents    = await fsPromises.readFile(this.sFile);
-        const oQuerySchema = JSON.parse(oContents.toString('utf-8'));
-        const oAJV         = new Ajv({
+        const oOptions = {
             coerceTypes: true,
             useDefaults: true
-        });
-
-        this.oValidator    = oAJV.compile(oQuerySchema);
+        };
+        const oAJV      = new Ajv(oOptions);
+        this.oValidator = oAJV.compile(this.oSchema);
     }
 
     validateRequest<T>(oQuery: ParsedUrlQuery, oLogger: Logger): T {
