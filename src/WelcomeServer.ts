@@ -149,7 +149,6 @@ export default class WelcomeServer<AppConfig> {
         } catch (oError) {
             this.oLogger.e('Server.Config.Error', {error: oError});
         }
-
     }
 
     async initWithJsonConfig(sConfigPath: string, fAfterConfig: AfterConfig) {

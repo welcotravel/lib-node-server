@@ -12,13 +12,14 @@ export default class WelcomeServer<AppConfig> {
     private bInitOnce;
     private oLogger;
     private oHTTPServer;
-    private oHttpListener;
+    private readonly oHttpListener;
     private fAfterConfig;
     private oConfig;
     private loadConfigFile;
     private loadConfigConsul;
     private updateConfig;
-    constructor(sName: string, oHttpListener: HttpListener, iPort?: number);
-    initWithConsulConfig(sConfigPrefix: string, aConfigPaths: string[], sPortConfigPath: string | undefined, fAfterConfig: AfterConfig): Promise<void>;
-    initWithJsonConfig(sConfigPath: string, sPortConfigPath: string | undefined, fAfterConfig: AfterConfig): Promise<void>;
+    constructor(sName: string, oHttpListener: HttpListener, sConfigPath: string);
+    constructor(sName: string, oHttpListener: HttpListener, iPort: number);
+    initWithConsulConfig(sConfigPrefix: string, aConfigPaths: string[], fAfterConfig: AfterConfig): Promise<void>;
+    initWithJsonConfig(sConfigPath: string, fAfterConfig: AfterConfig): Promise<void>;
 }
