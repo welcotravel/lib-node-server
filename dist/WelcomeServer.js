@@ -78,6 +78,9 @@ class WelcomeServer {
             if (this.sPortConfigPath) {
                 this.iPort = dot_object_1.default.pick(this.sPortConfigPath, oConfig);
             }
+            this.listen();
+        };
+        this.listen = async () => {
             if (!this.bInitOnce) {
                 this.bInitOnce = true;
                 // Fire up the node server - initialize the http-shutdown plugin which will gracefully shutdown the server after it's done working
@@ -108,6 +111,9 @@ class WelcomeServer {
         this.oLogger = new rsyslog_cee_1.Logger({
             service: `${sName}Server`
         });
+    }
+    async initWithoutConfig() {
+        await this.listen();
     }
     async initWithConsulConfig(sConfigPrefix, aConfigPaths) {
         this.sConfigPrefix = sConfigPrefix;
