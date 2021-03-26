@@ -127,6 +127,7 @@ class WelcomeServer {
         catch (oError) {
             this.oLogger.e('Server.Config.Error', { error: oError });
         }
+        return this.oConfig;
     }
     async loadJsonConfig(sConfigPath) {
         this.sConfigPath = sConfigPath;
@@ -143,6 +144,7 @@ class WelcomeServer {
         catch (oError) {
             this.oLogger.e('Server.Config.Error', { error: oError });
         }
+        return this.oConfig;
     }
 }
 exports.default = WelcomeServer;
