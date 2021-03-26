@@ -19,11 +19,10 @@ export default class WelcomeServer<AppConfig> {
     private loadConfigFile;
     private loadConfigConsul;
     private updateConfig;
-    private listen;
+    listen: () => Promise<void>;
     constructor(sName: string, oHttpListener: HttpListener, iPort: number);
     constructor(sName: string, oHttpListener: HttpListener, iPort: number, fAfterConfig: AfterConfig | undefined);
     constructor(sName: string, oHttpListener: HttpListener, sPortConfigPath: string, fAfterConfig: AfterConfig | undefined);
-    initWithoutConfig(): Promise<void>;
-    initWithConsulConfig(sConfigPrefix: string, aConfigPaths: string[]): Promise<void>;
-    initWithJsonConfig(sConfigPath: string): Promise<void>;
+    loadConsulConfig(sConfigPrefix: string, aConfigPaths: string[]): Promise<void>;
+    loadJsonConfig(sConfigPath: string): Promise<void>;
 }
