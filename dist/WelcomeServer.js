@@ -19,7 +19,7 @@ if (process.env.CONSUL_HOST) {
 }
 const Consul = ConsulLib(oConsulConfig);
 class WelcomeServer {
-    constructor(sName, oHttpListener, mPortOrConfigPath, fAfterConfig) {
+    constructor(sName, oHttpListener, mPortOrConfigPath, fAfterConfig = undefined) {
         this.sConfigPath = '';
         this.sConfigPrefix = '';
         this.aConfigPaths = [];

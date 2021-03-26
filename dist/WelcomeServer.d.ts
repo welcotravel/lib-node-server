@@ -20,7 +20,7 @@ export default class WelcomeServer<AppConfig> {
     private loadConfigConsul;
     private updateConfig;
     private listen;
-    constructor(sName: string, oHttpListener: HttpListener, iPort: number, fAfterConfig: undefined);
+    constructor(sName: string, oHttpListener: HttpListener, iPort: number);
     constructor(sName: string, oHttpListener: HttpListener, iPort: number, fAfterConfig: AfterConfig | undefined);
     constructor(sName: string, oHttpListener: HttpListener, sPortConfigPath: string, fAfterConfig: AfterConfig | undefined);
     initWithoutConfig(): Promise<void>;

@@ -125,10 +125,10 @@ export default class WelcomeServer<AppConfig> {
         }
     }
 
-    constructor(sName: string, oHttpListener: HttpListener, iPort: number, fAfterConfig: undefined);
-    constructor(sName: string, oHttpListener: HttpListener, iPort: number, fAfterConfig: AfterConfig | undefined);
-    constructor(sName: string, oHttpListener: HttpListener, sPortConfigPath: string, fAfterConfig: AfterConfig | undefined);
-    constructor(sName: string, oHttpListener: HttpListener, mPortOrConfigPath: string | number, fAfterConfig: AfterConfig | undefined) {
+    constructor(sName: string, oHttpListener: HttpListener, iPort: number); // No Config
+    constructor(sName: string, oHttpListener: HttpListener, iPort: number, fAfterConfig: AfterConfig | undefined); // With Port
+    constructor(sName: string, oHttpListener: HttpListener, sPortConfigPath: string, fAfterConfig: AfterConfig | undefined); // With Config Path
+    constructor(sName: string, oHttpListener: HttpListener, mPortOrConfigPath: string | number, fAfterConfig: AfterConfig | undefined = undefined) {
         this.oHttpListener   = oHttpListener;
         this.fAfterConfig    = fAfterConfig;
 
