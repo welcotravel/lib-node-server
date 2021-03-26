@@ -10,16 +10,14 @@ import {TraceTags} from "rsyslog-cee/src/Logger";
 require('http-shutdown').extend();
 
 const ConsulLib = require('consul');
-const oConsulConfig = {
+const CONSUL_CONFIG = {
     promisify: true,
     host: '127.0.0.1'
 };
 
 if (process.env.CONSUL_HOST) {
-    oConsulConfig.host = process.env.CONSUL_HOST;
+    CONSUL_CONFIG.host = process.env.CONSUL_HOST;
 }
-
-const Consul = ConsulLib(oConsulConfig)
 
 export type HttpListener = (oRequest: http.IncomingMessage, oResponse: http.ServerResponse) => Promise<void>;
 export type AfterConfig  = (oConfig: any, oTraceTags: TraceTags) => Promise<void>;
@@ -32,6 +30,7 @@ export default class WelcomeServer<AppConfig> {
     private aConfigPaths: string[]  = [];
     private sPortConfigPath: string | undefined;
 
+    private oConsul: any;
     private iPort: number = 80;
     private bInitOnce: boolean = false;
     private oHTTPServer: any; // cannot be http.Server because it also has the shutdown method
@@ -73,7 +72,7 @@ export default class WelcomeServer<AppConfig> {
         const oFlatConfig: {[key: string]: string} = {};
         const aGets = this.aConfigPaths.map(async (sPath) => {
             const sSlashed = this.sConfigPrefix + '/' + sPath.replace(/\./g, '/');
-            const oKey     = await Consul.kv.get({key: sSlashed});
+            const oKey     = await this.oConsul.kv.get({key: sSlashed});
             if (oKey) {
                 oFlatConfig[sPath] = oKey.Value;
             }
@@ -146,12 +145,13 @@ export default class WelcomeServer<AppConfig> {
     async loadConsulConfig(sConfigPrefix: string, aConfigPaths: string[]): Promise<AppConfig | undefined> {
         this.sConfigPrefix   = sConfigPrefix;
         this.aConfigPaths    = aConfigPaths;
+        this.oConsul         = ConsulLib(CONSUL_CONFIG);
 
         try {
             await this.loadConfigConsul();
 
-            const oWatch = Consul.watch({
-                method: Consul.kv.get,
+            const oWatch = this.oConsul.watch({
+                method: this.oConsul.kv.get,
                 options: {
                     key: this.sConfigPrefix
                 }
