@@ -100,6 +100,10 @@ export default class WelcomeServer<AppConfig> {
             this.iPort = Dot.pick(this.sPortConfigPath, oConfig);
         }
 
+        this.listen();
+    };
+
+    private listen = async () => {
         if (!this.bInitOnce) {
             this.bInitOnce = true;
 
@@ -119,12 +123,12 @@ export default class WelcomeServer<AppConfig> {
                 this.oLogger.summary('Init');
             });
         }
+    }
 
-    };
-
-    constructor(sName: string, oHttpListener: HttpListener, sPortConfigPath: string, fAfterConfig: AfterConfig);
-    constructor(sName: string, oHttpListener: HttpListener, iPort: number, fAfterConfig: AfterConfig);
-    constructor(sName: string, oHttpListener: HttpListener, mPortOrConfigPath: string | number, fAfterConfig: AfterConfig) {
+    constructor(sName: string, oHttpListener: HttpListener, iPort: number, fAfterConfig: undefined);
+    constructor(sName: string, oHttpListener: HttpListener, iPort: number, fAfterConfig: AfterConfig | undefined);
+    constructor(sName: string, oHttpListener: HttpListener, sPortConfigPath: string, fAfterConfig: AfterConfig | undefined);
+    constructor(sName: string, oHttpListener: HttpListener, mPortOrConfigPath: string | number, fAfterConfig: AfterConfig | undefined) {
         this.oHttpListener   = oHttpListener;
         this.fAfterConfig    = fAfterConfig;
 
@@ -137,6 +141,10 @@ export default class WelcomeServer<AppConfig> {
         this.oLogger = new Logger({
             service: `${sName}Server`
         });
+    }
+
+    async initWithoutConfig() {
+        await this.listen();
     }
 
     async initWithConsulConfig(sConfigPrefix: string, aConfigPaths: string[]) {
