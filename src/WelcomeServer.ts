@@ -61,7 +61,7 @@ export default class WelcomeServer<AppConfig> {
 
         try {
             const oConfig = <AppConfig> require(this.sConfigPath); // Update the global config var
-            this.updateConfig(oConfig);
+            await this.updateConfig(oConfig);
 
             this.oLogger.d('Server.Config.Ready', {source: 'file'});
         } catch (oError) {
@@ -82,7 +82,7 @@ export default class WelcomeServer<AppConfig> {
         try {
             await Promise.all(aGets);
             const oConfig = Dot.object(oFlatConfig);
-            this.updateConfig(<AppConfig> <unknown> oConfig);
+            await this.updateConfig(<AppConfig> <unknown> oConfig);
 
             this.oLogger.d('Server.Config.Ready', {source: 'consul'});
         } catch (oError) {
@@ -91,11 +91,15 @@ export default class WelcomeServer<AppConfig> {
         }
     };
 
-    private updateConfig = (oConfig: AppConfig) => {
+    private updateConfig = async (oConfig: AppConfig) => {
         this.oConfig = oConfig;
 
         if (this.sPortConfigPath) {
             this.iPort = Dot.pick(this.sPortConfigPath, oConfig);
+        }
+
+        if (this.fAfterConfig) {
+            await this.fAfterConfig(this.oConfig, this.oLogger.getTraceTags());
         }
     };
 
