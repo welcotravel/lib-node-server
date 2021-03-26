@@ -6,7 +6,7 @@ import {Logger}                  from 'rsyslog-cee';
 
 import ValidationError           from './ValidationError'
 
-import type { URLSearchParams }  from 'url';
+import type { URLSearchParams }  from 'node:url';
 
 export default class QueryValidation {
     readonly oSchema: AnySchema;
