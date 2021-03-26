@@ -15,6 +15,7 @@ export default class WelcomeServer<AppConfig> {
     private readonly oHttpListener;
     private fAfterConfig;
     private oConfig;
+    private static iRetryCount;
     private loadConfigFile;
     private loadConfigConsul;
     private updateConfig;

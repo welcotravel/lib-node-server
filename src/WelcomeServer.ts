@@ -21,8 +21,6 @@ if (process.env.CONSUL_HOST) {
 
 const Consul = ConsulLib(oConsulConfig)
 
-const fsPromises  = fs.promises;
-
 export type HttpListener = (oRequest: http.IncomingMessage, oResponse: http.ServerResponse) => Promise<void>;
 export type AfterConfig  = (oConfig: any, oTraceTags: TraceTags) => Promise<void>;
 
@@ -40,23 +38,33 @@ export default class WelcomeServer<AppConfig> {
     private fAfterConfig: AfterConfig | undefined;
     private oConfig: AppConfig | undefined;
 
+    private static iRetryCount = 0;
+
     // Check to see that we have access to the config file.  if so, update the config var, else retry
     // When consul-template is down or restarting, the config file will be missing.  This keeps
     // the server up and ready to start while consul-template gets itself together
     private loadConfigFile = async () => {
-        fsPromises.access(this.sConfigPath, fs.constants.R_OK)
-            .then(() => {
-                const oConfig = <AppConfig> require(this.sConfigPath); // Update the global config var
+        try {
+            await fs.promises.access(this.sConfigPath, fs.constants.R_OK);
+        } catch (oError) {
+            this.oLogger.w('Server.Config.NotAvailable', {source: 'file', error: oError});
+            WelcomeServer.iRetryCount++;
 
-                this.oLogger.d('Server.Config.Ready');
-                this.updateConfig(oConfig).catch(oError => {
-                    this.oLogger.e('Server.Config.Error', {error: oError});
-                });
-            })
-            .catch(oError => {
-                this.oLogger.w('Server.Config.NotAvailable', {error: oError});
+            if (WelcomeServer.iRetryCount < 10) {
                 setTimeout(this.loadConfigFile, 1000);
-            });
+                return;
+            }
+
+            throw oError;
+        }
+
+        try {
+            const oConfig = <AppConfig> require(this.sConfigPath); // Update the global config var
+            this.oLogger.d('Server.Config.Ready', {source: 'file'});
+            await this.updateConfig(oConfig);
+        } catch (oError) {
+            this.oLogger.e('Server.Config.Error', {source: 'file', error: oError});
+        }
     };
 
     private loadConfigConsul = async () => {
@@ -73,10 +81,10 @@ export default class WelcomeServer<AppConfig> {
             await Promise.all(aGets);
             const oConfig = Dot.object(oFlatConfig);
 
-            this.oLogger.d('Server.Config.Ready');
+            this.oLogger.d('Server.Config.Ready', {source: 'consul'});
             await this.updateConfig(<AppConfig> <unknown> oConfig);
         } catch (oError) {
-            this.oLogger.w('Server.Config.NotAvailable', {error: oError});
+            this.oLogger.w('Server.Config.NotAvailable', {source: 'consul', error: oError});
             setTimeout(this.loadConfigConsul, 1000);
         }
     };
