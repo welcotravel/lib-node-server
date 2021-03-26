@@ -2,11 +2,10 @@ import Ajv, {
     AnySchema,
     ValidateFunction
 }                                from 'ajv';
+import {ParsedUrlQuery}          from "querystring";
 import {Logger}                  from 'rsyslog-cee';
 
 import ValidationError           from './ValidationError'
-
-import type { URLSearchParams }  from 'node:url';
 
 export default class QueryValidation {
     readonly oSchema: AnySchema;
@@ -26,7 +25,7 @@ export default class QueryValidation {
         this.oValidator = oAJV.compile(this.oSchema);
     }
 
-    validateRequest<T>(oQuery: URLSearchParams, oLogger: Logger): T {
+    validateRequest<T>(oQuery: ParsedUrlQuery, oLogger: Logger): T {
         if (!this.oValidator) {
             throw new Error('Validator Not Initialized');
         }
