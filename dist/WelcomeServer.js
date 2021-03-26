@@ -10,14 +10,13 @@ const dot_object_1 = __importDefault(require("dot-object"));
 const rsyslog_cee_1 = require("rsyslog-cee");
 require('http-shutdown').extend();
 const ConsulLib = require('consul');
-const oConsulConfig = {
+const CONSUL_CONFIG = {
     promisify: true,
     host: '127.0.0.1'
 };
 if (process.env.CONSUL_HOST) {
-    oConsulConfig.host = process.env.CONSUL_HOST;
+    CONSUL_CONFIG.host = process.env.CONSUL_HOST;
 }
-const Consul = ConsulLib(oConsulConfig);
 class WelcomeServer {
     constructor(sName, oHttpListener, mPortOrConfigPath, fAfterConfig = undefined) {
         this.sConfigPath = '';
@@ -54,7 +53,7 @@ class WelcomeServer {
             const oFlatConfig = {};
             const aGets = this.aConfigPaths.map(async (sPath) => {
                 const sSlashed = this.sConfigPrefix + '/' + sPath.replace(/\./g, '/');
-                const oKey = await Consul.kv.get({ key: sSlashed });
+                const oKey = await this.oConsul.kv.get({ key: sSlashed });
                 if (oKey) {
                     oFlatConfig[sPath] = oKey.Value;
                 }
@@ -114,10 +113,11 @@ class WelcomeServer {
     async loadConsulConfig(sConfigPrefix, aConfigPaths) {
         this.sConfigPrefix = sConfigPrefix;
         this.aConfigPaths = aConfigPaths;
+        this.oConsul = ConsulLib(CONSUL_CONFIG);
         try {
             await this.loadConfigConsul();
-            const oWatch = Consul.watch({
-                method: Consul.kv.get,
+            const oWatch = this.oConsul.watch({
+                method: this.oConsul.kv.get,
                 options: {
                     key: this.sConfigPrefix
                 }

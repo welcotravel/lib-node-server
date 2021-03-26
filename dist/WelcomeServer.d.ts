@@ -10,6 +10,7 @@ export default class WelcomeServer<AppConfig> {
     private sConfigPrefix;
     private aConfigPaths;
     private sPortConfigPath;
+    private oConsul;
     private iPort;
     private bInitOnce;
     private oHTTPServer;
