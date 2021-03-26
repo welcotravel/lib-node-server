@@ -18,7 +18,7 @@ export default class WelcomeServer<AppConfig> {
     private loadConfigFile;
     private loadConfigConsul;
     private updateConfig;
-    constructor(sName: string, oHttpListener: HttpListener, sConfigPath: string, fAfterConfig: AfterConfig);
+    constructor(sName: string, oHttpListener: HttpListener, sPortConfigPath: string, fAfterConfig: AfterConfig);
     constructor(sName: string, oHttpListener: HttpListener, iPort: number, fAfterConfig: AfterConfig);
     initWithConsulConfig(sConfigPrefix: string, aConfigPaths: string[]): Promise<void>;
     initWithJsonConfig(sConfigPath: string): Promise<void>;

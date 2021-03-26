@@ -114,7 +114,7 @@ export default class WelcomeServer<AppConfig> {
 
     };
 
-    constructor(sName: string, oHttpListener: HttpListener, sConfigPath: string, fAfterConfig: AfterConfig);
+    constructor(sName: string, oHttpListener: HttpListener, sPortConfigPath: string, fAfterConfig: AfterConfig);
     constructor(sName: string, oHttpListener: HttpListener, iPort: number, fAfterConfig: AfterConfig);
     constructor(sName: string, oHttpListener: HttpListener, mPortOrConfigPath: string | number, fAfterConfig: AfterConfig) {
         this.oHttpListener   = oHttpListener;
