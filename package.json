@@ -1,6 +1,6 @@
 {
   "name": "lib-node-server",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "main": "dist/index.js",
   "private": true,
   "author": "Mark Armendariz <marka@welco.me>",
