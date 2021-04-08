@@ -26,7 +26,8 @@ class BaseAPI {
     static async _post(sPath, oParams) {
         BaseAPI.checkConfig();
         let oOptions = {
-            uri: `https://api.${BaseAPI.CONFIG.uri.domain}/${sPath}`,
+            uri: `https://${BaseAPI.CONFIG.domain.fabio}/${sPath}`,
+            host: BaseAPI.CONFIG.domain.api,
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded'
@@ -41,9 +42,10 @@ class BaseAPI {
     static async _get(sPath, oGet) {
         BaseAPI.checkConfig();
         let oOptions = {
-            uri: `https://api.${BaseAPI.CONFIG.uri.domain}/${sPath}`,
+            uri: `https://${BaseAPI.CONFIG.domain.fabio}/${sPath}`,
+            host: BaseAPI.CONFIG.domain.api,
             method: 'GET',
-            json: true
+            json: true,
         };
         if (oGet) {
             oOptions.qs = oGet;
@@ -55,7 +57,8 @@ class BaseAPI {
     static async _jsonPost(sPath, oPost) {
         BaseAPI.checkConfig();
         let oOptions = {
-            uri: `https://api.${BaseAPI.CONFIG.uri.domain}/${sPath}`,
+            uri: `https://${BaseAPI.CONFIG.domain.fabio}/${sPath}`,
+            host: BaseAPI.CONFIG.domain.api,
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -71,8 +74,8 @@ class BaseAPI {
         BaseAPI.checkConfig();
         let oPost = Object.assign({
             grant_type: 'client_credentials',
-            client_id: BaseAPI.CONFIG.api.service.id,
-            client_secret: BaseAPI.CONFIG.api.service.secret,
+            client_id: BaseAPI.CONFIG.api.id,
+            client_secret: BaseAPI.CONFIG.api.secret,
             scope: 'services'
         }, oTraceTags);
         const oResponse = await BaseAPI._post('/v3/auth/client', oPost);

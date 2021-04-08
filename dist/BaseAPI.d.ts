@@ -1,13 +1,12 @@
 import { UriOptions } from "request";
 export declare type BaseAPIConfig = {
-    uri: {
-        domain: string;
+    domain: {
+        fabio: string;
+        api: string;
     };
     api: {
-        service: {
-            id: string;
-            secret: string;
-        };
+        id: string;
+        secret: string;
     };
 };
 declare type Params = {

@@ -1,14 +1,13 @@
     import {UriOptions} from "request";
 
     export type BaseAPIConfig = {
-        uri: {
-            domain: string
+        domain: {
+            fabio: string,
+            api: string
         },
         api: {
-            service: {
-                id: string,
-                secret: string
-            }
+            id: string,
+            secret: string
         }
     }
 
@@ -52,7 +51,8 @@
             BaseAPI.checkConfig();
 
             let oOptions: UriOptions & RequestPromiseOptions = {
-                uri:      `https://api.${BaseAPI.CONFIG.uri.domain}/${sPath}`,
+                uri:      `https://${BaseAPI.CONFIG.domain.fabio}/${sPath}`,
+                host:     BaseAPI.CONFIG.domain.api,
                 method:   'POST',
                 headers:  {
                     'Content-Type': 'application/x-www-form-urlencoded'
@@ -70,9 +70,10 @@
             BaseAPI.checkConfig();
 
             let oOptions: UriOptions & RequestPromiseOptions = {
-                uri:      `https://api.${BaseAPI.CONFIG.uri.domain}/${sPath}`,
+                uri:      `https://${BaseAPI.CONFIG.domain.fabio}/${sPath}`,
+                host:     BaseAPI.CONFIG.domain.api,
                 method:   'GET',
-                json:     true
+                json:     true,
             };
 
             if (oGet) {
@@ -88,7 +89,8 @@
             BaseAPI.checkConfig();
 
             let oOptions: UriOptions & RequestPromiseOptions = {
-                uri:      `https://api.${BaseAPI.CONFIG.uri.domain}/${sPath}`,
+                uri:      `https://${BaseAPI.CONFIG.domain.fabio}/${sPath}`,
+                host:     BaseAPI.CONFIG.domain.api,
                 method:   'POST',
                 headers:  {
                     'Content-Type':   'application/json'
@@ -107,8 +109,8 @@
 
             let oPost = Object.assign({
                 grant_type:    'client_credentials',
-                client_id:     BaseAPI.CONFIG.api.service.id,
-                client_secret: BaseAPI.CONFIG.api.service.secret,
+                client_id:     BaseAPI.CONFIG.api.id,
+                client_secret: BaseAPI.CONFIG.api.secret,
                 scope:         'services'
             }, oTraceTags);
 
