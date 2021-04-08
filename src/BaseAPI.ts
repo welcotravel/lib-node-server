@@ -51,7 +51,7 @@
             BaseAPI.checkConfig();
 
             let oOptions: UriOptions & RequestPromiseOptions = {
-                uri:      `https://${BaseAPI.CONFIG.domain.fabio}/${sPath}`,
+                uri:      `http://${BaseAPI.CONFIG.domain.fabio}/${sPath}`,
                 host:     BaseAPI.CONFIG.domain.api,
                 method:   'POST',
                 headers:  {
@@ -70,7 +70,7 @@
             BaseAPI.checkConfig();
 
             let oOptions: UriOptions & RequestPromiseOptions = {
-                uri:      `https://${BaseAPI.CONFIG.domain.fabio}/${sPath}`,
+                uri:      `http://${BaseAPI.CONFIG.domain.fabio}/${sPath}`,
                 host:     BaseAPI.CONFIG.domain.api,
                 method:   'GET',
                 json:     true,
@@ -114,7 +114,7 @@
                 scope:         'services'
             }, oTraceTags);
 
-            const oResponse = await <AuthResponse> BaseAPI._post('/v3/auth/client', oPost);
+            const oResponse = await <AuthResponse> BaseAPI._post('v3/auth/client', oPost);
 
             if (oResponse.access_token) {
                 BaseAPI.ACCESS_TOKEN = oResponse.access_token;
