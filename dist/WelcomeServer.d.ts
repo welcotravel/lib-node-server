@@ -7,7 +7,6 @@ export declare type AfterConfig = (oConfig: any, oTraceTags: TraceTags) => Promi
 export default class WelcomeServer<AppConfig> {
     oLogger: Logger;
     private sConfigPath;
-    private sConfigPrefix;
     private aConfigPaths;
     private sPortConfigPath;
     private oConsul;
@@ -25,6 +24,6 @@ export default class WelcomeServer<AppConfig> {
     constructor(sName: string, oHttpListener: HttpListener, iPort: number);
     constructor(sName: string, oHttpListener: HttpListener, iPort: number, fAfterConfig: AfterConfig | undefined);
     constructor(sName: string, oHttpListener: HttpListener, sPortConfigPath: string, fAfterConfig: AfterConfig | undefined);
-    loadConsulConfig(sConfigPrefix: string, aConfigPaths: string[]): Promise<AppConfig | undefined>;
+    loadConsulConfig(aConfigPaths: string[]): Promise<AppConfig | undefined>;
     loadJsonConfig(sConfigPath: string): Promise<AppConfig | undefined>;
 }

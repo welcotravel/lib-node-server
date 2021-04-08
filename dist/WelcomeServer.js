@@ -20,7 +20,6 @@ if (process.env.CONSUL_HOST) {
 class WelcomeServer {
     constructor(sName, oHttpListener, mPortOrConfigPath, fAfterConfig = undefined) {
         this.sConfigPath = '';
-        this.sConfigPrefix = '';
         this.aConfigPaths = [];
         this.iPort = 80;
         this.bInitOnce = false;
@@ -52,7 +51,7 @@ class WelcomeServer {
         this.loadConfigConsul = async () => {
             const oFlatConfig = {};
             const aGets = this.aConfigPaths.map(async (sPath) => {
-                const sSlashed = this.sConfigPrefix + '/' + sPath.replace(/\./g, '/');
+                const sSlashed = sPath.replace(/\./g, '/');
                 const oKey = await this.oConsul.kv.get({ key: sSlashed });
                 if (oKey) {
                     oFlatConfig[sPath] = oKey.Value;
@@ -110,22 +109,25 @@ class WelcomeServer {
             service: `${sName}Server`
         });
     }
-    async loadConsulConfig(sConfigPrefix, aConfigPaths) {
-        this.sConfigPrefix = sConfigPrefix;
+    async loadConsulConfig(aConfigPaths) {
         this.aConfigPaths = aConfigPaths;
         this.oConsul = ConsulLib(CONSUL_CONFIG);
         try {
             await this.loadConfigConsul();
-            const oWatch = this.oConsul.watch({
-                method: this.oConsul.kv.get,
-                options: {
-                    key: this.sConfigPrefix
-                }
-            });
-            oWatch.on('change', async () => {
-                await this.loadConfigConsul();
-                this.listen();
-            });
+            if (this.aConfigPaths.length) {
+                this.aConfigPaths.forEach(sPath => {
+                    const oWatch = this.oConsul.watch({
+                        method: this.oConsul.kv.get,
+                        options: {
+                            key: sPath
+                        }
+                    });
+                    oWatch.on('change', async () => {
+                        await this.loadConfigConsul();
+                        this.listen();
+                    });
+                });
+            }
         }
         catch (oError) {
             this.oLogger.e('Server.Config.Error', { error: oError });
