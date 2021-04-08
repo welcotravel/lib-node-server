@@ -27,10 +27,10 @@ class BaseAPI {
         BaseAPI.checkConfig();
         let oOptions = {
             uri: `http://${BaseAPI.CONFIG.domain.fabio}/${sPath}`,
-            host: BaseAPI.CONFIG.domain.api,
             method: 'POST',
             headers: {
-                'Content-Type': 'application/x-www-form-urlencoded'
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'Host': BaseAPI.CONFIG.domain.api
             },
             json: true,
             formData: oParams
@@ -43,8 +43,10 @@ class BaseAPI {
         BaseAPI.checkConfig();
         let oOptions = {
             uri: `http://${BaseAPI.CONFIG.domain.fabio}/${sPath}`,
-            host: BaseAPI.CONFIG.domain.api,
             method: 'GET',
+            headers: {
+                'Host': BaseAPI.CONFIG.domain.api
+            },
             json: true,
         };
         if (oGet) {
@@ -58,10 +60,10 @@ class BaseAPI {
         BaseAPI.checkConfig();
         let oOptions = {
             uri: `http://${BaseAPI.CONFIG.domain.fabio}/${sPath}`,
-            host: BaseAPI.CONFIG.domain.api,
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Host': BaseAPI.CONFIG.domain.api
             },
             json: true,
             body: oPost
