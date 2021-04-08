@@ -89,7 +89,7 @@
             BaseAPI.checkConfig();
 
             let oOptions: UriOptions & RequestPromiseOptions = {
-                uri:      `https://${BaseAPI.CONFIG.domain.fabio}/${sPath}`,
+                uri:      `http://${BaseAPI.CONFIG.domain.fabio}/${sPath}`,
                 host:     BaseAPI.CONFIG.domain.api,
                 method:   'POST',
                 headers:  {

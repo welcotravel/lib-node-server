@@ -26,7 +26,7 @@ class BaseAPI {
     static async _post(sPath, oParams) {
         BaseAPI.checkConfig();
         let oOptions = {
-            uri: `https://${BaseAPI.CONFIG.domain.fabio}/${sPath}`,
+            uri: `http://${BaseAPI.CONFIG.domain.fabio}/${sPath}`,
             host: BaseAPI.CONFIG.domain.api,
             method: 'POST',
             headers: {
@@ -42,7 +42,7 @@ class BaseAPI {
     static async _get(sPath, oGet) {
         BaseAPI.checkConfig();
         let oOptions = {
-            uri: `https://${BaseAPI.CONFIG.domain.fabio}/${sPath}`,
+            uri: `http://${BaseAPI.CONFIG.domain.fabio}/${sPath}`,
             host: BaseAPI.CONFIG.domain.api,
             method: 'GET',
             json: true,
@@ -57,7 +57,7 @@ class BaseAPI {
     static async _jsonPost(sPath, oPost) {
         BaseAPI.checkConfig();
         let oOptions = {
-            uri: `https://${BaseAPI.CONFIG.domain.fabio}/${sPath}`,
+            uri: `http://${BaseAPI.CONFIG.domain.fabio}/${sPath}`,
             host: BaseAPI.CONFIG.domain.api,
             method: 'POST',
             headers: {
@@ -78,7 +78,7 @@ class BaseAPI {
             client_secret: BaseAPI.CONFIG.api.secret,
             scope: 'services'
         }, oTraceTags);
-        const oResponse = await BaseAPI._post('/v3/auth/client', oPost);
+        const oResponse = await BaseAPI._post('v3/auth/client', oPost);
         if (oResponse.access_token) {
             BaseAPI.ACCESS_TOKEN = oResponse.access_token;
             return;
