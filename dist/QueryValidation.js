@@ -28,10 +28,6 @@ class QueryValidation {
                 let aErrors = [];
                 this.oValidator.errors.map(oError => {
                     let sMessage = `${oError.message}`;
-                    if (oError.dataPath.length > 0) {
-                        let sParam = oError.dataPath.replace(/^\./, '');
-                        sMessage = `${sParam} ${sMessage}`;
-                    }
                     switch (oError.keyword) {
                         case 'enum':
                             if ('allowedValues' in oError.params) {
