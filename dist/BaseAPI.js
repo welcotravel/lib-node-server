@@ -36,7 +36,7 @@ class BaseAPI {
             formData: oParams
         };
         BaseAPI._includeAuthHeader(oOptions);
-        return await request_promise_native_1.default(oOptions);
+        return await (0, request_promise_native_1.default)(oOptions);
     }
     ;
     static async _get(sPath, oGet) {
@@ -53,7 +53,7 @@ class BaseAPI {
             oOptions.qs = oGet;
         }
         BaseAPI._includeAuthHeader(oOptions);
-        return await request_promise_native_1.default(oOptions);
+        return await (0, request_promise_native_1.default)(oOptions);
     }
     ;
     static async _jsonPost(sPath, oPost) {
@@ -69,7 +69,7 @@ class BaseAPI {
             body: oPost
         };
         BaseAPI._includeAuthHeader(oOptions);
-        return await request_promise_native_1.default(oOptions);
+        return await (0, request_promise_native_1.default)(oOptions);
     }
     ;
     static async auth(oTraceTags) {

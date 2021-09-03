@@ -11,7 +11,7 @@ const fsPromises = fs_1.default.promises;
 class APIDefinitionDownloader {
     // NOTE: Not using API.js because it's not guaranteed that it's been compiled correctly.  This script needs to run on its own
     static async download(oConfig, sDefinitionPath, oPaths) {
-        const sResponse = await request_promise_native_1.default({
+        const sResponse = await (0, request_promise_native_1.default)({
             uri: `https://api.${oConfig.api_domain}/v3/auth/client`,
             method: 'POST',
             headers: {
@@ -28,7 +28,7 @@ class APIDefinitionDownloader {
         if (!oAuth.access_token) {
             throw new Error('No AuthToken');
         }
-        const sDocs = await request_promise_native_1.default({
+        const sDocs = await (0, request_promise_native_1.default)({
             uri: `https://api.${oConfig.api_domain}/v3/services/docs`,
             method: 'GET',
             headers: {
@@ -110,7 +110,7 @@ class APIDefinitionDownloader {
                 if (aRequired.length) {
                     oSchema.required = aRequired;
                 }
-                return await json_schema_to_typescript_1.compile(oSchema, sName);
+                return await (0, json_schema_to_typescript_1.compile)(oSchema, sName);
             };
             const aSchemas = await Promise.all(Object.keys(oPaths).map(fParse));
             await fsPromises.writeFile(sDefinitionPath, aSchemas.join("\n\n"));

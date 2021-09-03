@@ -22,7 +22,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.WelcomeServer = exports.ValidationError = exports.QueryValidation = exports.PathRule = exports.PathParser = exports.HttpResponse = exports.HttpError = exports.BaseAPI = void 0;
+exports.WelcomeServer = exports.ValidationError = exports.QueryValidation = exports.PathRule = exports.PathParser = exports.HttpResponse = exports.HttpError = exports.BaseAPI = exports.APIDefinitionDownloader = void 0;
+const APIDefinitionDownloader_1 = __importDefault(require("./APIDefinitionDownloader"));
+exports.APIDefinitionDownloader = APIDefinitionDownloader_1.default;
 const BaseAPI_1 = __importDefault(require("./BaseAPI"));
 exports.BaseAPI = BaseAPI_1.default;
 const HttpError_1 = __importDefault(require("./HttpError"));
