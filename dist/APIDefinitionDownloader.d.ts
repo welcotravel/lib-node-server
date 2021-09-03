@@ -1,5 +1,5 @@
 export declare type APIDefinitionDownloaderConfig = {
-    api_domain: string;
+    api_uri: string;
     service_id: string;
     service_secret: string;
 };

@@ -7,7 +7,7 @@ import {compile, JSONSchema} from 'json-schema-to-typescript';
 const fsPromises  = fs.promises;
 
 export type APIDefinitionDownloaderConfig = {
-    api_domain:     string
+    api_uri:       string
     service_id:     string
     service_secret: string
 }
@@ -24,7 +24,7 @@ export default class APIDefinitionDownloader {
     // NOTE: Not using API.js because it's not guaranteed that it's been compiled correctly.  This script needs to run on its own
     public static async download(oConfig: APIDefinitionDownloaderConfig, sDefinitionPath: string, oPaths: APIDefinitionDownloaderPaths) {
         const sResponse = await request({
-            uri:      `https://${oConfig.api_domain}/v3/auth/client`,
+            uri:      `${oConfig.api_uri}/v3/auth/client`,
             method:   'POST',
             headers:  {
                 'Content-Type': 'application/x-www-form-urlencoded'
@@ -44,7 +44,7 @@ export default class APIDefinitionDownloader {
         }
 
         const sDocs = await request({
-            uri:      `https://${oConfig.api_domain}/v3/services/docs`,
+            uri:      `${oConfig.api_uri}/v3/services/docs`,
             method:   'GET',
             headers:  {
                 Authorization: `Bearer ${oAuth.access_token}`
