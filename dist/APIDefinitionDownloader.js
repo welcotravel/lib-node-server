@@ -12,7 +12,7 @@ class APIDefinitionDownloader {
     // NOTE: Not using API.js because it's not guaranteed that it's been compiled correctly.  This script needs to run on its own
     static async download(oConfig, sDefinitionPath, oPaths) {
         const sResponse = await (0, request_promise_native_1.default)({
-            uri: `https://api.${oConfig.api_domain}/v3/auth/client`,
+            uri: `https://${oConfig.api_domain}/v3/auth/client`,
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded'
@@ -29,7 +29,7 @@ class APIDefinitionDownloader {
             throw new Error('No AuthToken');
         }
         const sDocs = await (0, request_promise_native_1.default)({
-            uri: `https://api.${oConfig.api_domain}/v3/services/docs`,
+            uri: `https://${oConfig.api_domain}/v3/services/docs`,
             method: 'GET',
             headers: {
                 Authorization: `Bearer ${oAuth.access_token}`
