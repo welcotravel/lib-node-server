@@ -80,7 +80,7 @@ class BaseAPI {
             client_secret: BaseAPI.CONFIG.api.secret,
             scope: 'services'
         }, oTraceTags);
-        const oResponse = await BaseAPI._post('v3/auth/client', oPost);
+        const oResponse = await BaseAPI._jsonPost('v3/auth/client', oPost);
         if (oResponse.access_token) {
             BaseAPI.ACCESS_TOKEN = oResponse.access_token;
             return;

@@ -116,7 +116,7 @@
                 scope:         'services'
             }, oTraceTags);
 
-            const oResponse = await <AuthResponse> BaseAPI._post('v3/auth/client', oPost);
+            const oResponse = await <AuthResponse> BaseAPI._jsonPost('v3/auth/client', oPost);
 
             if (oResponse.access_token) {
                 BaseAPI.ACCESS_TOKEN = oResponse.access_token;
