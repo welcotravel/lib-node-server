@@ -78,7 +78,7 @@ class BaseAPI {
             grant_type: 'client_credentials',
             client_id: BaseAPI.CONFIG.api.id,
             client_secret: BaseAPI.CONFIG.api.secret,
-            scope: 'services'
+            scope: BaseAPI.CONFIG.api.scope
         }, oTraceTags);
         const oResponse = await BaseAPI._jsonPost('v3/auth/client', oPost);
         if (oResponse.access_token) {

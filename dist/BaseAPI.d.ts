@@ -5,6 +5,7 @@ export declare type BaseAPIConfig = {
         api: string;
     };
     api: {
+        scope: string;
         id: string;
         secret: string;
     };
