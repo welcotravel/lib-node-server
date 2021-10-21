@@ -6,6 +6,7 @@
             api: string
         },
         api: {
+            scope: string,
             id: string,
             secret: string
         }
@@ -113,7 +114,7 @@
                 grant_type:    'client_credentials',
                 client_id:     BaseAPI.CONFIG.api.id,
                 client_secret: BaseAPI.CONFIG.api.secret,
-                scope:         'services'
+                scope:         BaseAPI.CONFIG.api.scope
             }, oTraceTags);
 
             const oResponse = await <AuthResponse> BaseAPI._jsonPost('v3/auth/client', oPost);
