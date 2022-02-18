@@ -102,9 +102,15 @@ class WelcomeServer {
         this.restart = async () => {
             const bReady = await this.shutdown();
             if (this.oHTTPServer && bReady) {
-                this.oHTTPServer.listen(this.iPort);
-                this.oLogger.d('Server.Restarted', { port: this.iPort });
-                this.oLogger.summary('Init');
+                try {
+                    this.oHTTPServer.listen(this.iPort);
+                    this.oLogger.d('Server.Restarted', { port: this.iPort });
+                    this.oLogger.summary('Init');
+                }
+                catch (e) {
+                    // @ts-ignore
+                    this.oLogger.e('Server.Restart', { error: e.message });
+                }
             }
         };
         this.listen = async () => {
