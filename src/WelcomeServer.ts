@@ -69,7 +69,6 @@ export default class WelcomeServer<AppConfig> {
     };
 
     private loadConfigConsul = async () => {
-
         let bChanged     = false;
         const oOldConfig = this.oConfig ? Dot.dot(this.oConfig) : {};
 
@@ -85,8 +84,6 @@ export default class WelcomeServer<AppConfig> {
             }
         });
 
-
-
         try {
             await Promise.all(aGets);
 
@@ -96,13 +93,16 @@ export default class WelcomeServer<AppConfig> {
                 await this.updateConfig(<AppConfig><unknown>oConfig);
 
                 this.oLogger.d('Server.Config.Ready', {source: 'consul'});
-            } else {
-                this.oLogger.d('Server.Config.NoChange', {source: 'consul'});
+                return true;
             }
+
+            // this.oLogger.d('Server.Config.NoChange', {source: 'consul'});
         } catch (oError) {
             this.oLogger.w('Server.Config.NotAvailable', {source: 'consul', error: oError});
             setTimeout(this.loadConfigConsul, 1000);
         }
+
+        return false;
     };
 
     private updateConfig = async (oConfig: AppConfig) => {
@@ -218,8 +218,10 @@ export default class WelcomeServer<AppConfig> {
                     });
 
                     oWatch.on('change', async () => {
-                        await this.loadConfigConsul();
-                        this.listen();
+                        const bChanged = await this.loadConfigConsul();
+                        if (bChanged) {
+                            this.listen();
+                        }
                     });
                 })
             }

@@ -70,15 +70,15 @@ class WelcomeServer {
                     this.oLogger.d('Server.Config.loadConfigConsul', { previous: this.oConfig, next: oConfig });
                     await this.updateConfig(oConfig);
                     this.oLogger.d('Server.Config.Ready', { source: 'consul' });
+                    return true;
                 }
-                else {
-                    this.oLogger.d('Server.Config.NoChange', { source: 'consul' });
-                }
+                // this.oLogger.d('Server.Config.NoChange', {source: 'consul'});
             }
             catch (oError) {
                 this.oLogger.w('Server.Config.NotAvailable', { source: 'consul', error: oError });
                 setTimeout(this.loadConfigConsul, 1000);
             }
+            return false;
         };
         this.updateConfig = async (oConfig) => {
             this.oConfig = oConfig;
@@ -169,8 +169,10 @@ class WelcomeServer {
                         }
                     });
                     oWatch.on('change', async () => {
-                        await this.loadConfigConsul();
-                        this.listen();
+                        const bChanged = await this.loadConfigConsul();
+                        if (bChanged) {
+                            this.listen();
+                        }
                     });
                 });
             }
