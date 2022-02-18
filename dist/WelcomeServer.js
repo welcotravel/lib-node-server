@@ -50,19 +50,30 @@ class WelcomeServer {
             }
         };
         this.loadConfigConsul = async () => {
+            let bChanged = false;
+            const oOldConfig = this.oConfig ? dot_object_1.default.dot(this.oConfig) : {};
             const oFlatConfig = {};
             const aGets = this.aConfigPaths.map(async (sPath) => {
                 const sSlashed = sPath.replace(/\./g, '/');
                 const oKey = await this.oConsul.kv.get({ key: sSlashed });
                 if (oKey) {
                     oFlatConfig[sPath] = oKey.Value;
+                    if (!bChanged) {
+                        bChanged = oFlatConfig[sPath] !== oOldConfig[sPath];
+                    }
                 }
             });
             try {
                 await Promise.all(aGets);
-                const oConfig = dot_object_1.default.object(oFlatConfig);
-                await this.updateConfig(oConfig);
-                this.oLogger.d('Server.Config.Ready', { source: 'consul' });
+                if (bChanged) {
+                    const oConfig = dot_object_1.default.object(oFlatConfig);
+                    this.oLogger.d('Server.Config.loadConfigConsul', { previous: this.oConfig, next: oConfig });
+                    await this.updateConfig(oConfig);
+                    this.oLogger.d('Server.Config.Ready', { source: 'consul' });
+                }
+                else {
+                    this.oLogger.d('Server.Config.NoChange', { source: 'consul' });
+                }
             }
             catch (oError) {
                 this.oLogger.w('Server.Config.NotAvailable', { source: 'consul', error: oError });
@@ -88,11 +99,11 @@ class WelcomeServer {
             if (!bSuccess) {
                 switch (sCode) {
                     case "TIMED_OUT":
-                        this.oLogger.w('Server.Config.Changed', { state: sCode });
+                        this.oLogger.w('Server.shutdown', { state: sCode });
                         break;
                     case "SERVER_ERROR":
                     case "INTERNAL_ERROR":
-                        this.oLogger.e('Server.Config.Changed', { state: sCode, error: sMessage });
+                        this.oLogger.e('Server.shutdown', { state: sCode, error: sMessage });
                         break;
                 }
             }
@@ -128,7 +139,7 @@ class WelcomeServer {
             }
             else {
                 // we've initialized before, so this must be a restart due to a config change
-                this.oLogger.d('Server.Config.Changed');
+                this.oLogger.d('Server.listen');
                 this.restart();
             }
         };

@@ -69,21 +69,36 @@ export default class WelcomeServer<AppConfig> {
     };
 
     private loadConfigConsul = async () => {
+
+        let bChanged     = false;
+        const oOldConfig = this.oConfig ? Dot.dot(this.oConfig) : {};
+
         const oFlatConfig: {[key: string]: string} = {};
         const aGets = this.aConfigPaths.map(async (sPath) => {
             const sSlashed = sPath.replace(/\./g, '/');
             const oKey     = await this.oConsul.kv.get({key: sSlashed});
             if (oKey) {
                 oFlatConfig[sPath] = oKey.Value;
+                if (!bChanged) {
+                    bChanged = oFlatConfig[sPath] !== oOldConfig[sPath];
+                }
             }
         });
 
+
+
         try {
             await Promise.all(aGets);
-            const oConfig = Dot.object(oFlatConfig);
-            await this.updateConfig(<AppConfig> <unknown> oConfig);
 
-            this.oLogger.d('Server.Config.Ready', {source: 'consul'});
+            if (bChanged) {
+                const oConfig = Dot.object(oFlatConfig);
+                this.oLogger.d('Server.Config.loadConfigConsul', {previous: this.oConfig, next: oConfig});
+                await this.updateConfig(<AppConfig><unknown>oConfig);
+
+                this.oLogger.d('Server.Config.Ready', {source: 'consul'});
+            } else {
+                this.oLogger.d('Server.Config.NoChange', {source: 'consul'});
+            }
         } catch (oError) {
             this.oLogger.w('Server.Config.NotAvailable', {source: 'consul', error: oError});
             setTimeout(this.loadConfigConsul, 1000);
@@ -115,12 +130,12 @@ export default class WelcomeServer<AppConfig> {
         if (!bSuccess) {
             switch(sCode) {
                 case "TIMED_OUT":
-                    this.oLogger.w('Server.Config.Changed', {state: sCode});
+                    this.oLogger.w('Server.shutdown', {state: sCode});
                     break;
 
                 case "SERVER_ERROR":
                 case "INTERNAL_ERROR":
-                    this.oLogger.e('Server.Config.Changed', {state: sCode, error: sMessage});
+                    this.oLogger.e('Server.shutdown', {state: sCode, error: sMessage});
                     break;
             }
         }
@@ -162,7 +177,7 @@ export default class WelcomeServer<AppConfig> {
             this.oLogger.summary('Init');
         } else {
             // we've initialized before, so this must be a restart due to a config change
-            this.oLogger.d('Server.Config.Changed');
+            this.oLogger.d('Server.listen');
 
             this.restart();
         }
