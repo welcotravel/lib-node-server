@@ -16,10 +16,13 @@ export default class WelcomeServer<AppConfig> {
     private readonly oHttpListener;
     private fAfterConfig;
     private oConfig;
+    private oTerminator;
     private static iRetryCount;
     private loadConfigFile;
     private loadConfigConsul;
     private updateConfig;
+    private shutdown;
+    private restart;
     listen: () => Promise<void>;
     constructor(sName: string, oHttpListener: HttpListener, iPort: number);
     constructor(sName: string, oHttpListener: HttpListener, iPort: number, fAfterConfig: AfterConfig | undefined);
