@@ -21,6 +21,7 @@ export default class WelcomeServer<AppConfig> {
     private loadConfigFile;
     private loadConfigConsul;
     private updateConfig;
+    private bTerminating;
     private shutdown;
     private restart;
     listen: () => Promise<void>;

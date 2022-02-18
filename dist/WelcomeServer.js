@@ -78,7 +78,12 @@ class WelcomeServer {
                 await this.fAfterConfig(this.oConfig, this.oLogger.getTraceTags());
             }
         };
+        this.bTerminating = false;
         this.shutdown = async () => {
+            if (this.bTerminating) {
+                return false;
+            }
+            this.bTerminating = true;
             const { bSuccess, sCode, sMessage, oError } = await this.oTerminator.terminate();
             if (!bSuccess) {
                 switch (sCode) {
@@ -91,10 +96,12 @@ class WelcomeServer {
                         break;
                 }
             }
+            this.bTerminating = false;
+            return true;
         };
         this.restart = async () => {
-            await this.shutdown();
-            if (this.oHTTPServer) {
+            const bReady = await this.shutdown();
+            if (this.oHTTPServer && bReady) {
                 this.oHTTPServer.listen(this.iPort);
                 this.oLogger.d('Server.Restarted', { port: this.iPort });
                 this.oLogger.summary('Init');
@@ -108,9 +115,7 @@ class WelcomeServer {
                 this.oHTTPServer.listen(this.iPort);
                 this.oTerminator = HttpTerminator({
                     server: this.oHTTPServer,
-                    gracefulTerminationTimeout: 5000,
-                    maxWaitTimeout: 30000,
-                    logger: console // optional, default is `global.console`. If termination goes wild the module might log about it using `logger.warn()`.
+                    gracefulTerminationTimeout: 1000, // optional, how much time we give "keep-alive" connections to close before destryong them
                 });
                 this.oLogger.d('Server.Started', { port: this.iPort });
                 this.oLogger.summary('Init');
