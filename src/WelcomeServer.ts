@@ -102,7 +102,15 @@ export default class WelcomeServer<AppConfig> {
         }
     };
 
+    private bTerminating: boolean = false;
+
     private shutdown = async() => {
+        if (this.bTerminating) {
+            return;
+        }
+
+        this.bTerminating = true;
+
         const { bSuccess, sCode, sMessage, oError } = await this.oTerminator.terminate();
         if (!bSuccess) {
             switch(sCode) {
@@ -116,6 +124,8 @@ export default class WelcomeServer<AppConfig> {
                     break;
             }
         }
+
+        this.bTerminating = false;
     };
 
     private restart = async() => {
@@ -138,9 +148,7 @@ export default class WelcomeServer<AppConfig> {
 
             this.oTerminator = HttpTerminator({
                 server:                     this.oHTTPServer,
-                gracefulTerminationTimeout: 5000,   // optional, how much time we give "keep-alive" connections to close before destryong them
-                maxWaitTimeout:             30000,  // optional, termination will return {success:false,code:"TIMED_OUT"} if it takes longer than that
-                logger:                     console // optional, default is `global.console`. If termination goes wild the module might log about it using `logger.warn()`.
+                gracefulTerminationTimeout: 1000,   // optional, how much time we give "keep-alive" connections to close before destryong them
             });
 
             this.oLogger.d('Server.Started', {port: this.iPort});
