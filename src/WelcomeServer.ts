@@ -104,9 +104,9 @@ export default class WelcomeServer<AppConfig> {
 
     private bTerminating: boolean = false;
 
-    private shutdown = async() => {
+    private shutdown = async(): Promise<boolean> => {
         if (this.bTerminating) {
-            return;
+            return false;
         }
 
         this.bTerminating = true;
@@ -126,12 +126,14 @@ export default class WelcomeServer<AppConfig> {
         }
 
         this.bTerminating = false;
+
+        return true;
     };
 
     private restart = async() => {
-        await this.shutdown();
+        const bReady = await this.shutdown();
 
-        if (this.oHTTPServer) {
+        if (this.oHTTPServer && bReady) {
             this.oHTTPServer.listen(this.iPort);
             this.oLogger.d('Server.Restarted', {port: this.iPort});
             this.oLogger.summary('Init');
